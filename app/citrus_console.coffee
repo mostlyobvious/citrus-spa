@@ -7,7 +7,7 @@ class citrus.console.Application
   constructor: ->
     usecase    = new citrus.console.Usecase()
     gui        = new citrus.console.Gui()
-    serverSide = new citrus.console.InMemoryServerSide()
+    serverSide = new citrus.console.ServerSide('http://127.0.0.1:8080')
     glue       = new citrus.console.Glue(usecase, gui, serverSide)
     usecase.start()
 
@@ -75,10 +75,19 @@ class citrus.console.InMemoryServerSide
   fetchConsole: (build) =>
     @consoleDataReceived('........')
     intervalId = setInterval(( => @consoleDataReceived('.')), 25)
-    setTimeout(( => 
+    setTimeout(( =>
       clearInterval(intervalId)
       @consoleDataReceived('\n\nFinished in 0.84704 seconds\n62 examples, 0 failures\n\nRandomized with seed 15015')
     ), 1000)
+
+  consoleDataReceived: (data) =>
+
+class citrus.console.ServerSide
+  constructor: (@apiUrl) ->
+
+  fetchConsole: (build) =>
+    eventSource = new EventSource("#{@apiUrl}/builds/#{build.uuid}/console")
+    eventSource.addEventListener('message', (message) => @consoleDataReceived(message.data))
 
   consoleDataReceived: (data) =>
 

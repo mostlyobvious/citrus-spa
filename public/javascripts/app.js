@@ -104,7 +104,7 @@ citrus.console.Application = (function() {
     var glue, gui, serverSide, usecase;
     usecase = new citrus.console.Usecase();
     gui = new citrus.console.Gui();
-    serverSide = new citrus.console.InMemoryServerSide();
+    serverSide = new citrus.console.ServerSide('http://127.0.0.1:8080');
     glue = new citrus.console.Glue(usecase, gui, serverSide);
     usecase.start();
   }
@@ -241,6 +241,28 @@ citrus.console.InMemoryServerSide = (function() {
   InMemoryServerSide.prototype.consoleDataReceived = function(data) {};
 
   return InMemoryServerSide;
+
+})();
+
+citrus.console.ServerSide = (function() {
+  function ServerSide(apiUrl) {
+    this.apiUrl = apiUrl;
+    this.consoleDataReceived = __bind(this.consoleDataReceived, this);
+    this.fetchConsole = __bind(this.fetchConsole, this);
+  }
+
+  ServerSide.prototype.fetchConsole = function(build) {
+    var eventSource,
+      _this = this;
+    eventSource = new EventSource("" + this.apiUrl + "/builds/" + build.uuid + "/console");
+    return eventSource.addEventListener('message', function(message) {
+      return _this.consoleDataReceived(message.data);
+    });
+  };
+
+  ServerSide.prototype.consoleDataReceived = function(data) {};
+
+  return ServerSide;
 
 })();
 
