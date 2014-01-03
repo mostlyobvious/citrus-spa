@@ -43,20 +43,20 @@
 
   var initModule = function(name, definition) {
     var module = {id: name, exports: {}};
+    cache[name] = module;
     definition(module.exports, localRequire(name), module);
-    var exports = cache[name] = module.exports;
-    return exports;
+    return module.exports;
   };
 
   var require = function(name, loaderPath) {
     var path = expand(name, '.');
     if (loaderPath == null) loaderPath = '/';
 
-    if (has(cache, path)) return cache[path];
+    if (has(cache, path)) return cache[path].exports;
     if (has(modules, path)) return initModule(path, modules[path]);
 
     var dirIndex = expand(path, './index');
-    if (has(cache, dirIndex)) return cache[dirIndex];
+    if (has(cache, dirIndex)) return cache[dirIndex].exports;
     if (has(modules, dirIndex)) return initModule(dirIndex, modules[dirIndex]);
 
     throw new Error('Cannot find module "' + name + '" from '+ '"' + loaderPath + '"');
@@ -104,7 +104,7 @@ citrus.console.Application = (function() {
     var glue, gui, serverSide, usecase;
     usecase = new citrus.console.Usecase();
     gui = new citrus.console.Gui();
-    serverSide = new citrus.console.ServerSide('http://127.0.0.1:8080');
+    serverSide = new citrus.console.ServerSide('http://api.citrus.arkency');
     glue = new citrus.console.Glue(usecase, gui, serverSide);
     usecase.start();
   }
@@ -297,4 +297,4 @@ _.defaults(this, {
 });
 
 ;
-//@ sourceMappingURL=app.js.map
+//# sourceMappingURL=app.js.map
