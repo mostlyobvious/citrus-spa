@@ -7,7 +7,7 @@ class citrus.console.Application
   constructor: ->
     usecase    = new citrus.console.Usecase()
     gui        = new citrus.console.Gui()
-    serverSide = new citrus.console.ServerSide('http://127.0.0.1:8080')
+    serverSide = new citrus.console.ServerSide('http://api.citrus.arkency')
     glue       = new citrus.console.Glue(usecase, gui, serverSide)
     usecase.start()
 
